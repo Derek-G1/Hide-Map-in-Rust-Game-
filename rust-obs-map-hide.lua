@@ -26,14 +26,42 @@ function set_visibility(visible)
     end
 end
 
+-- Upvalues to track hotkey and overlate state
+local hotkey_active = false
+local overlay_active = false
+local timer_count = 0
+local timer_delay_ms = 250
+
+-- Timer callback for delayed overlay removal
+local function disable_overlay()
+    -- Keep overlay up until a minimum of (2 * timer_release_ms) has elapsed since release
+    if hotkey_active then
+        timer_count = 0
+    elseif timer_count < 1 then
+        timer_count = timer_count + 1
+    else
+        set_visibility(false)
+        overlay_active = false
+        timer_count = 0
+        debug_log("Timer lapsed - hiding source")
+        obs.remove_current_callback()
+    end
+end
+
 -- Callback for key press/release
 function on_hotkey(pressed)
     if pressed then
-        debug_log("Hotkey pressed - showing source")
-        set_visibility(true)
+        hotkey_active = true
+        -- Do not add a new timer if overlay is already active
+        if not overlay_active then
+            overlay_active = true
+            set_visibility(true)
+            obs.create_timer(disable_overlay, timer_delay_ms)
+            debug_log("Hotkey pressed - showing source")
+        end
     else
-        debug_log("Hotkey released - hiding source")
-        set_visibility(false)
+        hotkey_active = false
+        debug_log("Hotkey released")
     end
 end
 
