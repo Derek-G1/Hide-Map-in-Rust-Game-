@@ -30,7 +30,7 @@ A Lua script for OBS Studio that instantly hides your map in Rust when pressing 
    - Click the + under Sources
    - Select "Image"
    - Name it "Map Hidden" (or your preferred name)
-   - Choose any image (solid color recommended)
+   - Choose any image
    - Position it to cover your map area
    - Make sure it's hidden by default
 
